@@ -1,0 +1,11 @@
+transformers
+datasets
+torch
+fastapi
+gradio
+mlflow
+wandb
+uvicorn
+pandas
+numpy
+scikit-learn
