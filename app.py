@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import io
 from model import ReviewClassifier
 from PIL import Image
+import traceback
 
 # Initialize the model
 model = ReviewClassifier()
@@ -59,7 +60,7 @@ def batch_process(file):
     """
     try:
         # Read the CSV file
-        df = pd.read_csv(file.name)
+        df = pd.read_csv(file.name, encoding='utf-8')
         
         # Check if there's a column named 'review' or 'text'
         if 'review' in df.columns:
@@ -97,12 +98,11 @@ def batch_process(file):
         plt.savefig(buf, format='png', bbox_inches='tight')
         buf.seek(0)
         plt.close()
+        image = Image.open(buf)
         
-        return {
-            "Results Table": results_df,
-            "Category Distribution": buf
-        }
+        return [results_df, image]
     except Exception as e:
+        print(traceback.format_exc())
         return f"Error processing file: {str(e)}"
 
 # Create the Gradio interface
@@ -127,7 +127,7 @@ with gr.Blocks(title="Customer Review Classifier") as demo:
                 viz_output = gr.Image(label="Category Scores")
     
     with gr.Tab("Batch Processing"):
-        gr.Markdown("CSV file should have a column with ""review"" or ""text"" as the header/label")
+        gr.Markdown("CSV file should have a column with ""review"" or \"text\" as the header/label")
         with gr.Row():
             with gr.Column():
                 file_input = gr.File(label="Upload CSV file with reviews")
